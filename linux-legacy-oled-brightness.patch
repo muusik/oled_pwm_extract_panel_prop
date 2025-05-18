@@ -84,10 +84,10 @@ index c846ef4acf5b..8a9eae55b362 100644
  }
 diff --git a/drivers/gpu/drm/i915/display/intel_dp_legacy_oled_brightness.c b/drivers/gpu/drm/i915/display/intel_dp_legacy_oled_brightness.c
 new file mode 100644
-index 000000000000..6959b34c621e
+index 000000000000..e3df9b3338cb
 --- /dev/null
 +++ b/drivers/gpu/drm/i915/display/intel_dp_legacy_oled_brightness.c
-@@ -0,0 +1,446 @@
+@@ -0,0 +1,445 @@
 +/*
 + * Copyright © 2025 Chris Xiong
 + *
@@ -122,8 +122,8 @@ index 000000000000..6959b34c621e
 +#include "linux/stdarg.h"
 +
 +static bool intel_dp_aux_legacy_write_sequence(struct drm_dp_aux *aux, const u32 *address_seq, const u8 *value_seq, size_t length) {
-+	drm_dbg_kms(aux->drm_dev, "intel_dp_aux_legacy_write_sequence: %*phN", (int)length, value_seq);
 +	for (size_t p = 0; p < length; ++p) {
++		drm_dbg_kms(aux->drm_dev, "intel_dp_aux_legacy_write_sequence: writing 0x%02x to 0x%x", value_seq[p], address_seq[p]);
 +		if (drm_dp_dpcd_writeb(aux, address_seq[p], value_seq[p]) < 1) {
 +			return false;
 +		}
@@ -314,14 +314,13 @@ index 000000000000..6959b34c621e
 +	}
 +
 +	if (!intel_dp_aux_legacy_write_sequence(aux, address_seq4, value_seq4, 6)) goto fail;
-+	drm_dbg_kms(display->drm, "brightness_gamma @ %d: %*ph\n", 100 - brightness, 32, brightness_gamma);
++	drm_dbg_kms(display->drm, "brightness_gamma @ %d: %*ph\n", 100 - brightness, 33, brightness_gamma);
 +	write_addr_buf = kmalloc_array(0x21 * 2, 4, GFP_KERNEL);
 +	write_val_buf = kmalloc_array(0x21 * 2, 1, GFP_KERNEL);
 +	for (int i = 0; i <= 0x20; ++i) {
 +		write_addr_buf[i * 2] = 0x492;
 +		write_addr_buf[i * 2 + 1] = 0x493;
 +		write_val_buf[i * 2] = i + 0x10;
-+		if (drm_dp_dpcd_writeb(aux, 0x492, i + 0x10) < 1) goto fail;
 +		if (i == 10 || i == 21 || i == 32)
 +			write_val_buf[i * 2 + 1] = brightness_gamma[i] & 0xf;
 +		else
