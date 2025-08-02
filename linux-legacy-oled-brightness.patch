@@ -1,8 +1,8 @@
 diff --git a/drivers/gpu/drm/i915/Makefile b/drivers/gpu/drm/i915/Makefile
-index ed05b131ed3a..65acc2170875 100644
+index e153686256c9..a4148ee2e378 100644
 --- a/drivers/gpu/drm/i915/Makefile
 +++ b/drivers/gpu/drm/i915/Makefile
-@@ -329,6 +329,7 @@ i915-y += \
+@@ -330,6 +330,7 @@ i915-y += \
  	display/intel_dp.o \
  	display/intel_dp_aux.o \
  	display/intel_dp_aux_backlight.o \
@@ -11,7 +11,7 @@ index ed05b131ed3a..65acc2170875 100644
  	display/intel_dp_link_training.o \
  	display/intel_dp_mst.o \
 diff --git a/drivers/gpu/drm/i915/display/intel_display_types.h b/drivers/gpu/drm/i915/display/intel_display_types.h
-index 99a6fd2900b9..92c56485e2b8 100644
+index d6d0440dcee9..5fb041b89cae 100644
 --- a/drivers/gpu/drm/i915/display/intel_display_types.h
 +++ b/drivers/gpu/drm/i915/display/intel_display_types.h
 @@ -50,6 +50,7 @@
@@ -33,10 +33,10 @@ index 99a6fd2900b9..92c56485e2b8 100644
  
  		struct backlight_device *device;
 diff --git a/drivers/gpu/drm/i915/display/intel_dp_aux_backlight.c b/drivers/gpu/drm/i915/display/intel_dp_aux_backlight.c
-index 8173de8aec63..2ddbf170cb1c 100644
+index 271b27c9de51..e8c346807d59 100644
 --- a/drivers/gpu/drm/i915/display/intel_dp_aux_backlight.c
 +++ b/drivers/gpu/drm/i915/display/intel_dp_aux_backlight.c
-@@ -41,6 +41,7 @@
+@@ -40,6 +40,7 @@
  #include "intel_display_core.h"
  #include "intel_display_types.h"
  #include "intel_dp.h"
@@ -44,7 +44,7 @@ index 8173de8aec63..2ddbf170cb1c 100644
  #include "intel_dp_aux_backlight.h"
  
  /*
-@@ -101,6 +102,7 @@ enum intel_dp_aux_backlight_modparam {
+@@ -100,6 +101,7 @@ enum intel_dp_aux_backlight_modparam {
  	INTEL_DP_AUX_BACKLIGHT_ON = 1,
  	INTEL_DP_AUX_BACKLIGHT_FORCE_VESA = 2,
  	INTEL_DP_AUX_BACKLIGHT_FORCE_INTEL = 3,
@@ -84,10 +84,10 @@ index 8173de8aec63..2ddbf170cb1c 100644
  }
 diff --git a/drivers/gpu/drm/i915/display/intel_dp_legacy_oled_brightness.c b/drivers/gpu/drm/i915/display/intel_dp_legacy_oled_brightness.c
 new file mode 100644
-index 000000000000..3071f5b60940
+index 000000000000..5ee102ac9006
 --- /dev/null
 +++ b/drivers/gpu/drm/i915/display/intel_dp_legacy_oled_brightness.c
-@@ -0,0 +1,509 @@
+@@ -0,0 +1,505 @@
 +// SPDX-License-Identifier: MIT
 +/*
 + * Copyright © 2025 Chris Xiong
@@ -348,7 +348,7 @@ index 000000000000..3071f5b60940
 +	}
 +	if (!intel_dp_aux_legacy_write_sequence(aux, write_addr_buf, write_val_buf, 0x21 * 2))
 +		goto fail;
-+	udelay(1000);
++	usleep_range(1000, 1100);
 +	if (!intel_dp_aux_legacy_write_sequence_var(aux, address_seq5, value_seq5, 14, 1,
 +						    9, panel_data->SP[brightness]))
 +		goto fail;
@@ -517,15 +517,11 @@ index 000000000000..3071f5b60940
 +	panel->backlight.max = 100;
 +	panel->backlight.min = 0;
 +	panel->backlight.level = 100;
-+	if (!intel_dp_aux_legacy_handshake(connector)) {
-+		ret = -ENODEV;
-+		goto fail;
-+	}
-+	intel_dp_aux_legacy_get_elvss_max_offset(connector);
 +	if (!intel_dp_aux_legacy_get_tcon_gamma(connector)) {
 +		ret = -ENODEV;
 +		goto fail;
 +	}
++	intel_dp_aux_legacy_get_elvss_max_offset(connector);
 +	intel_dp_aux_legacy_calculate_interpolated_values(connector);
 +	panel_data->values_initialized = true;
 +	ret = 0;
