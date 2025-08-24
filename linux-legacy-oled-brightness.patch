@@ -84,14 +84,16 @@ index 271b27c9de51..e8c346807d59 100644
  }
 diff --git a/drivers/gpu/drm/i915/display/intel_dp_legacy_oled_brightness.c b/drivers/gpu/drm/i915/display/intel_dp_legacy_oled_brightness.c
 new file mode 100644
-index 000000000000..5ee102ac9006
+index 000000000000..15e0b2bde383
 --- /dev/null
 +++ b/drivers/gpu/drm/i915/display/intel_dp_legacy_oled_brightness.c
-@@ -0,0 +1,505 @@
+@@ -0,0 +1,507 @@
 +// SPDX-License-Identifier: MIT
 +/*
 + * Copyright © 2025 Chris Xiong
 + */
++
++#include <drm/drm_print.h>
 +
 +#include "intel_backlight.h"
 +#include "intel_display_core.h"
