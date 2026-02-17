@@ -1,8 +1,14 @@
+commit ebb701f0c1039bc076f46802bc02be2751df2572
+Author: Chris Xiong <chris@pineapple.cat>
+Date:   Tue Feb 17 13:24:52 2026 -0500
+
+    Legacy OLED brightness patch for linux-6.19.
+
 diff --git a/drivers/gpu/drm/i915/Makefile b/drivers/gpu/drm/i915/Makefile
-index e153686256c9..a4148ee2e378 100644
+index 4db24050edb0..4606ab7e2cb4 100644
 --- a/drivers/gpu/drm/i915/Makefile
 +++ b/drivers/gpu/drm/i915/Makefile
-@@ -330,6 +330,7 @@ i915-y += \
+@@ -348,6 +348,7 @@ i915-y += \
  	display/intel_dp.o \
  	display/intel_dp_aux.o \
  	display/intel_dp_aux_backlight.o \
@@ -11,18 +17,18 @@ index e153686256c9..a4148ee2e378 100644
  	display/intel_dp_link_training.o \
  	display/intel_dp_mst.o \
 diff --git a/drivers/gpu/drm/i915/display/intel_display_types.h b/drivers/gpu/drm/i915/display/intel_display_types.h
-index d6d0440dcee9..5fb041b89cae 100644
+index 06bf8f7c0989..f71d49a9f512 100644
 --- a/drivers/gpu/drm/i915/display/intel_display_types.h
 +++ b/drivers/gpu/drm/i915/display/intel_display_types.h
-@@ -50,6 +50,7 @@
- #include "intel_display_power.h"
+@@ -52,6 +52,7 @@
  #include "intel_dpll_mgr.h"
+ #include "intel_dsi_vbt_defs.h"
  #include "intel_wm_types.h"
 +#include "intel_dp_legacy_oled_brightness.h"
  
  struct cec_notifier;
  struct drm_printer;
-@@ -423,6 +424,9 @@ struct intel_panel {
+@@ -432,6 +433,9 @@ struct intel_panel {
  				bool supports_sdp_colorimetry;
  				bool supports_tone_mapping;
  			} intel_cap;
@@ -33,7 +39,7 @@ index d6d0440dcee9..5fb041b89cae 100644
  
  		struct backlight_device *device;
 diff --git a/drivers/gpu/drm/i915/display/intel_dp_aux_backlight.c b/drivers/gpu/drm/i915/display/intel_dp_aux_backlight.c
-index 271b27c9de51..e8c346807d59 100644
+index eb05ef4bd9f6..090e138acc67 100644
 --- a/drivers/gpu/drm/i915/display/intel_dp_aux_backlight.c
 +++ b/drivers/gpu/drm/i915/display/intel_dp_aux_backlight.c
 @@ -40,6 +40,7 @@
@@ -52,7 +58,7 @@ index 271b27c9de51..e8c346807d59 100644
  };
  
  static bool is_intel_tcon_cap(const u8 tcon_cap[4])
-@@ -702,7 +704,7 @@ int intel_dp_aux_init_backlight_funcs(struct intel_connector *connector)
+@@ -644,7 +646,7 @@ int intel_dp_aux_init_backlight_funcs(struct intel_connector *connector)
  	struct intel_dp *intel_dp = intel_attached_dp(connector);
  	struct drm_device *dev = connector->base.dev;
  	struct intel_panel *panel = &connector->panel;
@@ -61,7 +67,7 @@ index 271b27c9de51..e8c346807d59 100644
  
  	/* Check the VBT and user's module parameters to figure out which
  	 * interfaces to probe
-@@ -734,6 +736,9 @@ int intel_dp_aux_init_backlight_funcs(struct intel_connector *connector)
+@@ -676,6 +678,9 @@ int intel_dp_aux_init_backlight_funcs(struct intel_connector *connector)
  	case INTEL_DP_AUX_BACKLIGHT_FORCE_INTEL:
  		try_intel_interface = true;
  		break;
@@ -71,7 +77,7 @@ index 271b27c9de51..e8c346807d59 100644
  	}
  
  	/* For eDP 1.5 and above we are supposed to use VESA interface for brightness control */
-@@ -768,5 +773,10 @@ int intel_dp_aux_init_backlight_funcs(struct intel_connector *connector)
+@@ -710,5 +715,10 @@ int intel_dp_aux_init_backlight_funcs(struct intel_connector *connector)
  		return 0;
  	}
  
@@ -84,10 +90,10 @@ index 271b27c9de51..e8c346807d59 100644
  }
 diff --git a/drivers/gpu/drm/i915/display/intel_dp_legacy_oled_brightness.c b/drivers/gpu/drm/i915/display/intel_dp_legacy_oled_brightness.c
 new file mode 100644
-index 000000000000..15e0b2bde383
+index 000000000000..f6fd003ee8fc
 --- /dev/null
 +++ b/drivers/gpu/drm/i915/display/intel_dp_legacy_oled_brightness.c
-@@ -0,0 +1,507 @@
+@@ -0,0 +1,512 @@
 +// SPDX-License-Identifier: MIT
 +/*
 + * Copyright © 2025 Chris Xiong
@@ -247,7 +253,7 @@ index 000000000000..15e0b2bde383
 +							       3, (u8)(k << 7),
 +							       5, (u8)(k >> 1));
 +			if (i == 0 && j == 0)
-+				udelay(100);
++				usleep_range(100, 150);
 +			drm_dp_dpcd_readb(aux, 0x493, &interm->tcon_gamma[i][j]);
 +			if (++k >= (i + 1) * 0xb)
 +				k = i * 0xb;
@@ -432,9 +438,9 @@ index 000000000000..15e0b2bde383
 +}
 +
 +static bool fw_read_data(const struct firmware *fw,
-+			const u8 **read_ptr,
-+			void *output,
-+			u32 expected_length)
++			 const u8 **read_ptr,
++			 void *output,
++			 u32 expected_length)
 +{
 +	if (fw->size - (*read_ptr - fw->data) < expected_length)
 +		return false;
@@ -507,7 +513,7 @@ index 000000000000..15e0b2bde383
 +	struct intel_legacy_panel_data *panel_data = &panel->backlight.edp.legacy.panel_data;
 +	int ret;
 +
-+	panel_data->intermediates = kzalloc(sizeof(struct intel_legacy_panel_data_intermediate),
++	panel_data->intermediates = kzalloc(sizeof(*panel_data->intermediates),
 +					    GFP_KERNEL);
 +	if (!panel_data->intermediates) {
 +		ret = -ENOMEM;
@@ -532,8 +538,9 @@ index 000000000000..15e0b2bde383
 +	panel_data->intermediates = NULL;
 +	return ret;
 +}
++
 +static void intel_dp_aux_legacy_disable_backlight(const struct drm_connector_state *old_conn_state,
-+						u32 level)
++						  u32 level)
 +{
 +	struct intel_connector *connector = to_intel_connector(old_conn_state->connector);
 +	struct intel_panel *panel = &connector->panel;
@@ -543,9 +550,10 @@ index 000000000000..15e0b2bde383
 +		intel_dp_aux_legacy_setup_backlight(connector, PIPE_A);
 +	intel_dp_aux_legacy_write_brightness(connector, 0);
 +}
++
 +static void
 +intel_dp_aux_legacy_enable_backlight(const struct intel_crtc_state *crtc_state,
-+				   const struct drm_connector_state *conn_state, u32 level)
++				     const struct drm_connector_state *conn_state, u32 level)
 +{
 +	struct intel_connector *connector = to_intel_connector(conn_state->connector);
 +	struct intel_panel *panel = &connector->panel;
@@ -558,12 +566,14 @@ index 000000000000..15e0b2bde383
 +		intel_dp_aux_legacy_setup_backlight(connector, PIPE_A);
 +	intel_dp_aux_legacy_write_brightness(connector, level);
 +}
++
 +static u32 intel_dp_aux_legacy_get_backlight(struct intel_connector *connector, enum pipe unused)
 +{
 +	struct intel_panel *panel = &connector->panel;
 +
 +	return panel->backlight.level;
 +}
++
 +static void
 +intel_dp_aux_legacy_set_backlight(const struct drm_connector_state *conn_state, u32 level)
 +{
@@ -591,6 +601,7 @@ index 000000000000..15e0b2bde383
 +{
 +	return &intel_dp_aux_legacy_bl_funcs;
 +}
++
 +bool intel_dp_aux_legacy_brightness_supported(struct intel_connector *connector)
 +{
 +	return intel_dp_aux_legacy_handshake(connector);
