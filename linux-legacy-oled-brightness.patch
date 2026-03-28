@@ -1,4 +1,4 @@
-commit ebb701f0c1039bc076f46802bc02be2751df2572
+commit 1084484ad499ad105d2e2e5eb667e8ac13bc1cbe
 Author: Chris Xiong <chris@pineapple.cat>
 Date:   Tue Feb 17 13:24:52 2026 -0500
 
@@ -17,10 +17,10 @@ index 4db24050edb0..4606ab7e2cb4 100644
  	display/intel_dp_link_training.o \
  	display/intel_dp_mst.o \
 diff --git a/drivers/gpu/drm/i915/display/intel_display_types.h b/drivers/gpu/drm/i915/display/intel_display_types.h
-index 06bf8f7c0989..f71d49a9f512 100644
+index 1a7188970f24..b09fad2c9bd9 100644
 --- a/drivers/gpu/drm/i915/display/intel_display_types.h
 +++ b/drivers/gpu/drm/i915/display/intel_display_types.h
-@@ -52,6 +52,7 @@
+@@ -53,6 +53,7 @@
  #include "intel_dpll_mgr.h"
  #include "intel_dsi_vbt_defs.h"
  #include "intel_wm_types.h"
@@ -28,7 +28,7 @@ index 06bf8f7c0989..f71d49a9f512 100644
  
  struct cec_notifier;
  struct drm_printer;
-@@ -432,6 +433,9 @@ struct intel_panel {
+@@ -433,6 +434,9 @@ struct intel_panel {
  				bool supports_sdp_colorimetry;
  				bool supports_tone_mapping;
  			} intel_cap;
@@ -652,3 +652,15 @@ index 000000000000..16f1f5185121
 +bool intel_dp_aux_legacy_brightness_supported(struct intel_connector *connector);
 +
 +#endif /* __INTEL_DP_LEGACY_OLED_BRIGHTNESS_H__ */
+diff --git a/drivers/gpu/drm/xe/Makefile b/drivers/gpu/drm/xe/Makefile
+index 62be4a5227e4..b4d2da626fb0 100644
+--- a/drivers/gpu/drm/xe/Makefile
++++ b/drivers/gpu/drm/xe/Makefile
+@@ -276,6 +276,7 @@ xe-$(CONFIG_DRM_XE_DISPLAY) += \
+ 	i915-display/intel_dp.o \
+ 	i915-display/intel_dp_aux.o \
+ 	i915-display/intel_dp_aux_backlight.o \
++	i915-display/intel_dp_legacy_oled_brightness.o \
+ 	i915-display/intel_dp_hdcp.o \
+ 	i915-display/intel_dp_link_training.o \
+ 	i915-display/intel_dp_mst.o \
