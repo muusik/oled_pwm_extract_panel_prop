@@ -14,12 +14,16 @@ This repository contains the required kernel patches and tools to generate the f
 
  - ``linux-legacy-oled-brightness.patch``: The patch itself. Sorry I didn't bother writing a proper commit message.
  - ``gen_panel_prop.py``: Generates ``intel_legacy_panel_data.bin``, a firmware file required by the driver.
+ - ``extract_panel_prop.py``: Generates the same file from the Windows driver package instead, so it holds
+   none of the panel's values itself (MIT). Give it the package's ``.exe`` (needs ``innoextract``), the
+   unpacked directory, or ``PanelDriver.inf`` and ``PanelDriver.sys``. For the X1 Yoga 1st and 2nd gen that
+   is Lenovo's ``n1fdl04w`` or ``n1ndp03w``; both contain the same ``PanelDriver.sys``.
 
 `Read this for more information, I guess. <https://chrisoft.org/blog/post/2025-04-28.html>`_
 
 Instructions for ThinkPad X1 Yoga 1st gen / 2nd gen:
 
- 1. Run ``gen_panel_prop.py`` to generate ``intel_legacy_panel_data.bin``. Put the generated file in your
+ 1. Run ``gen_panel_prop.py`` (or ``extract_panel_prop.py n1ndp03w.exe``) to generate ``intel_legacy_panel_data.bin``. Put the generated file in your
     firmware directory (and if needed, your initramfs).
  2. Patch the sources for the kernel of your choice. Compile and install it.
  3. Boot your new kernel with an additional kernel parameter ``i915.enable_dpcd_backlight=99``. Check if it works.
