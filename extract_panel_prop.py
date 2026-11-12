@@ -3,6 +3,10 @@
 # Copyright 2026 Johannes Dahl
 """Generate intel_legacy_panel_data.bin from Intel's Windows OLED panel driver.
 
+Based on Chris Xiong's reverse engineering of the driver, described in
+https://chrisoft.org/blog/post/2025-04-28.html, and on his gen_panel_prop.py, whose output
+format and interpolation formula this follows.
+
 The panel's values are not in this script: they are read from the driver package the user
 supplies (PanelDriver.inf and PanelDriver.sys, as in Lenovo's n1fdl04w or n1ndp03w for the
 ThinkPad X1 Yoga 1st and 2nd gen). The output is the same as gen_panel_prop.py's.

@@ -18,12 +18,14 @@ This repository contains the required kernel patches and tools to generate the f
    none of the panel's values itself (MIT). Give it the package's ``.exe`` (needs ``innoextract``), the
    unpacked directory, or ``PanelDriver.inf`` and ``PanelDriver.sys``. For the X1 Yoga 1st and 2nd gen that
    is Lenovo's ``n1fdl04w`` or ``n1ndp03w``; both contain the same ``PanelDriver.sys``.
+ - ``download_panel_prop.sh``: Downloads ``n1ndp03w`` (or ``n1fdl04w``) from Lenovo, checks its SHA-256 and
+   runs ``extract_panel_prop.py`` on it.
 
 `Read this for more information, I guess. <https://chrisoft.org/blog/post/2025-04-28.html>`_
 
 Instructions for ThinkPad X1 Yoga 1st gen / 2nd gen:
 
- 1. Run ``gen_panel_prop.py`` (or ``extract_panel_prop.py n1ndp03w.exe``) to generate ``intel_legacy_panel_data.bin``. Put the generated file in your
+ 1. Run ``gen_panel_prop.py`` (or ``download_panel_prop.sh``) to generate ``intel_legacy_panel_data.bin``. Put the generated file in your
     firmware directory (and if needed, your initramfs).
  2. Patch the sources for the kernel of your choice. Compile and install it.
  3. Boot your new kernel with an additional kernel parameter ``i915.enable_dpcd_backlight=99``. Check if it works.
