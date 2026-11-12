@@ -1,6 +1,11 @@
 Proper PWM brightness for legacy OLED pannels on an Intel GPU
 =============================================================
 
+This is a fork of `Chris Xiong's repository <https://git.chrisoft.org/git/linux-legacy-oled-brightness.git>`_.
+It adds ``extract_panel_prop.py`` and ``download_panel_prop.sh`` (MIT), which generate the panel data from
+the Windows driver package instead of numbers kept in the script; Chris is welcome to merge any of it back.
+Everything else is his, and states no license beyond the two files the patch adds (MIT).
+
 Reverse engineered from the Windows Driver. Thanks Lenovo for including the debugging symbols in your driver
 package so that even a reverse engineering illiterate like me can do it.
 
