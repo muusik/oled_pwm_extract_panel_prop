@@ -2,7 +2,7 @@ Proper PWM brightness for legacy OLED pannels on an Intel GPU
 =============================================================
 
 This is a fork of `Chris Xiong's repository <https://git.chrisoft.org/git/linux-legacy-oled-brightness.git>`_.
-It adds ``extract_panel_prop.py`` and ``download_panel_prop.sh`` (MIT), which generate the panel data from
+It adds ``extract_panel_prop.py`` with ``x86_64_decode.py``, and ``download_panel_prop.sh`` (MIT), which generate the panel data from
 the Windows driver package instead of numbers kept in the script; Chris is welcome to merge any of it back.
 Everything else is his, and states no license beyond the two files the patch adds (MIT).
 
@@ -22,7 +22,8 @@ This repository contains the required kernel patches and tools to generate the f
  - ``extract_panel_prop.py``: Generates the same file from the Windows driver package instead, so it holds
    none of the panel's values itself (MIT). Give it the package's ``.exe`` (needs ``innoextract``), the
    unpacked directory, or ``PanelDriver.inf`` and ``PanelDriver.sys``. For the X1 Yoga 1st and 2nd gen that
-   is Lenovo's ``n1fdl04w`` or ``n1ndp03w``; both contain the same ``PanelDriver.sys``.
+   is Lenovo's ``n1fdl04w`` or ``n1ndp03w``; both contain the same ``PanelDriver.sys``. It needs
+   ``x86_64_decode.py`` (MIT), the small x86-64 decoder it reads the driver's code with, in its directory.
  - ``download_panel_prop.sh``: Downloads ``n1ndp03w`` (or ``n1fdl04w``) from Lenovo, checks its SHA-256 and
    runs ``extract_panel_prop.py`` on it.
 
